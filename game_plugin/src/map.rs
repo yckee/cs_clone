@@ -1,6 +1,8 @@
-use crate::loading::TextureAssets;
+use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
+
+
 
 pub struct MapPlugin;
 
@@ -21,7 +23,9 @@ fn spawn_camera(mut commands: Commands) {
 fn spawn_map(
     mut commands: Commands,
     textures: Res<TextureAssets>,
+    maps: Res<MapAssets>,
     texture_atlases: Res<Assets<TextureAtlas>>,
+    ass_maps: Res<Assets<MapAsset>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let atlas = texture_atlases
@@ -44,5 +48,7 @@ fn spawn_map(
             texture_atlas: textures.simple_background.clone(),
             ..Default::default()
         });
-
+    let mass = ass_maps.get(maps.map_one.clone()).expect("loh");
+    println!("{:?}", mass);
+        
 }
