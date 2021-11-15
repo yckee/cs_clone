@@ -1,7 +1,20 @@
+// TODO: rewrite to use struck for Map and/or MapTile. Get right size and pos of the tile sprite
+
 use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
 
+
+const MAP_W: f32 = 32.0;
+const MAP_H: f32 = 32.0;
+
+
+fn index_to_pos(x: f32, y:f32, window_x:f32, window_y:f32) -> Vec2 {
+    Vec2::new(
+        x / MAP_W * window_x  - 0.5 * window_x +(0.5 * window_x / MAP_W),
+        y / MAP_H * window_y - 0.5 * window_y + (0.5 * window_y / MAP_H)
+    )
+}
 
 
 pub struct MapPlugin;
@@ -26,29 +39,31 @@ fn spawn_map(
     maps: Res<MapAssets>,
     texture_atlases: Res<Assets<TextureAtlas>>,
     ass_maps: Res<Assets<MapAsset>>,
+    windows: Res<Windows>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let atlas = texture_atlases
-        .get(textures.simple_background.clone())
-        .expect("Failed to find atlas");
 
-    commands.spawn_bundle(SpriteBundle {
-        material: materials.add(atlas.texture.clone().into()),
-        transform: Transform::from_xyz(0.0, -100.0, 1.0),
-        ..Default::default()
-    });
+    let mass = ass_maps
+        .get(maps.map_one.clone())
+        .expect("Failed to find MapAsset");
 
-    commands
-        .spawn_bundle(SpriteSheetBundle {
-            transform: Transform {
-                translation: Vec3::new(0., 150., 0.),
-                ..Default::default()
-            },
-            sprite: TextureAtlasSprite::new(0),
-            texture_atlas: textures.simple_background.clone(),
-            ..Default::default()
-        });
-    let mass = ass_maps.get(maps.map_one.clone()).expect("loh");
-    println!("{:?}", mass);
-        
+    for (y, row) in mass.map.iter().enumerate(){
+        for (x, tile_type) in row.iter().enumerate(){
+            let window = windows.get_primary().unwrap();
+            let pos = index_to_pos(x as f32, y as f32, window.width(), window.height());
+            commands
+                .spawn_bundle(SpriteSheetBundle {
+                    transform: Transform {
+                        translation: pos.extend(1.0),
+                        // scale: Vec3::new(0.5, 0.5, 0.5),
+                        ..Default::default()
+                    },
+                    sprite: TextureAtlasSprite::new(*tile_type),
+                    texture_atlas: textures.tileset.clone(),
+                    ..Default::default()
+                });
+
+        }
+    }
+       
 }

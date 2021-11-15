@@ -85,7 +85,7 @@ pub struct AudioAssets {
 pub struct TextureAssets {
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 6, rows = 2))]
     #[asset(path = "textures/templates/templates_map_one.png")]
-    pub simple_background: Handle<TextureAtlas>,
+    pub tileset: Handle<TextureAtlas>,
 
 }
 
