@@ -11,8 +11,8 @@ const MAP_H: f32 = 32.0;
 
 fn index_to_pos(x: f32, y:f32, window_x:f32, window_y:f32) -> Vec2 {
     Vec2::new(
-        x / MAP_W * window_x  - 0.5 * window_x +(0.5 * window_x / MAP_W),
-        y / MAP_H * window_y - 0.5 * window_y + (0.5 * window_y / MAP_H)
+        x / MAP_W * window_x  - 0.5 * window_x + (0.5 * window_x / MAP_W),
+        0.5 * window_y - y / MAP_H * window_y - (0.5 * window_y / MAP_H),
     )
 }
 
@@ -51,6 +51,7 @@ fn spawn_map(
         for (x, tile_type) in row.iter().enumerate(){
             let window = windows.get_primary().unwrap();
             let pos = index_to_pos(x as f32, y as f32, window.width(), window.height());
+            
             commands
                 .spawn_bundle(SpriteSheetBundle {
                     transform: Transform {
@@ -65,5 +66,16 @@ fn spawn_map(
 
         }
     }
+    // commands
+    // .spawn_bundle(SpriteSheetBundle {
+    //     transform: Transform {
+    //         translation: Vec3::ZERO,
+    //         // scale: Vec3::new(0.5, 0.5, 0.5),
+    //         ..Default::default()
+    //     },
+    //     sprite: TextureAtlasSprite::new(4),
+    //     texture_atlas: textures.tileset.clone(),
+    //     ..Default::default()
+    // });
        
 }
