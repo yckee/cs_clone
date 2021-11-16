@@ -1,7 +1,9 @@
+mod actions;
 mod loading;
 mod map;
 mod player;
 
+use crate::actions::ActionsPlugin;
 use crate::loading::LoadingPlugin;
 use crate::map::MapPlugin;
 use crate::player::PlayerPlugin;
@@ -31,7 +33,9 @@ impl Plugin for GamePlugin {
         app.add_state(GameState::Loading)
             .add_plugin(LoadingPlugin)
             .add_plugin(MapPlugin)
-            .add_plugin(PlayerPlugin);
+            .add_plugin(PlayerPlugin)
+            .add_plugin(ActionsPlugin)
+            ;
 
         // #[cfg(debug_assertions)]
         // {
