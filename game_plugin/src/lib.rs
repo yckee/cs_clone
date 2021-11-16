@@ -1,8 +1,10 @@
 mod loading;
 mod map;
+mod player;
 
 use crate::loading::LoadingPlugin;
 use crate::map::MapPlugin;
+use crate::player::PlayerPlugin;
 
 use bevy::app::AppBuilder;
 #[cfg(debug_assertions)]
@@ -28,7 +30,8 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_state(GameState::Loading)
             .add_plugin(LoadingPlugin)
-            .add_plugin(MapPlugin);
+            .add_plugin(MapPlugin)
+            .add_plugin(PlayerPlugin);
 
         // #[cfg(debug_assertions)]
         // {

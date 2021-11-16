@@ -85,6 +85,13 @@ pub struct TextureAssets {
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 6, rows = 2))]
     #[asset(path = "textures/templates/templates_map_one.png")]
     pub tileset: Handle<TextureAtlas>,
+
+    #[asset(texture_atlas(tile_size_x = 64., tile_size_y = 64., columns = 2, rows = 1))]
+    #[asset(path = "textures/character_one/character_one_sprite_animation_stay.png")]
+    pub player_stay: Handle<TextureAtlas>,
+
+    #[asset(path = "textures/character_one/character_one_sprite.png")]
+    pub player: Handle<Texture>,
 }
 
 #[derive(AssetCollection)]
