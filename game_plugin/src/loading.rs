@@ -4,9 +4,9 @@ use serde::Deserialize;
 use crate::GameState;
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
-    utils::BoxedFuture, 
+    prelude::*,
     reflect::TypeUuid,
-    prelude::*
+    utils::BoxedFuture,
 };
 
 use bevy_asset_loader::AssetCollection;
@@ -23,22 +23,23 @@ pub struct MapAsset {
 pub struct MapAssetLoader;
 
 impl AssetLoader for MapAssetLoader {
-    fn load<'a>(&'a self, bytes: &'a [u8], load_context:&'a mut LoadContext) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
+    fn load<'a>(
+        &'a self,
+        bytes: &'a [u8],
+        load_context: &'a mut LoadContext,
+    ) -> BoxedFuture<'a, Result<(), anyhow::Error>> {
         Box::pin(async move {
-            let mut rdr = ReaderBuilder::new()
-                .has_headers(false)
-                .from_reader(bytes);
+            let mut rdr = ReaderBuilder::new().has_headers(false).from_reader(bytes);
             let mut map: Vec<Vec<u32>> = Vec::new();
 
-            for result in rdr.deserialize(){
+            for result in rdr.deserialize() {
                 let record: Vec<u32> = result?;
                 map.push(record);
             }
 
-            let map_asset = MapAsset{map};
+            let map_asset = MapAsset { map };
             load_context.set_default_asset(LoadedAsset::new(map_asset));
             Ok(())
-
         })
     }
 
@@ -54,9 +55,7 @@ pub struct LoadingPlugin;
 /// If interested, take a look at https://bevy-cheatbook.github.io/features/assets.html
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-            .add_asset::<MapAsset>()
-            .add_asset_loader(MapAssetLoader);
+        app.add_asset::<MapAsset>().add_asset_loader(MapAssetLoader);
         bevy_asset_loader::AssetLoader::new(GameState::Loading, GameState::Playing)
             .with_collection::<FontAssets>()
             .with_collection::<AudioAssets>()
@@ -86,7 +85,6 @@ pub struct TextureAssets {
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 6, rows = 2))]
     #[asset(path = "textures/templates/templates_map_one.png")]
     pub tileset: Handle<TextureAtlas>,
-
 }
 
 #[derive(AssetCollection)]

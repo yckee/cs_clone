@@ -4,7 +4,6 @@ mod map;
 use crate::loading::LoadingPlugin;
 use crate::map::MapPlugin;
 
-
 use bevy::app::AppBuilder;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
@@ -29,9 +28,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_state(GameState::Loading)
             .add_plugin(LoadingPlugin)
-            .add_plugin(MapPlugin)
-            ;
-
+            .add_plugin(MapPlugin);
 
         // #[cfg(debug_assertions)]
         // {
