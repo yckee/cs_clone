@@ -3,11 +3,13 @@ mod consts;
 mod loading;
 mod map;
 mod player;
+mod physics;
 
 use crate::actions::ActionsPlugin;
 use crate::loading::LoadingPlugin;
 use crate::map::MapPlugin;
 use crate::player::PlayerPlugin;
+use crate::physics::*;
 
 use bevy::app::AppBuilder;
 #[cfg(debug_assertions)]
@@ -35,12 +37,9 @@ impl Plugin for GamePlugin {
             .add_plugin(LoadingPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(ActionsPlugin);
+            .add_plugin(ActionsPlugin)
+            .add_plugin(PhysicsPlugin)
+            .insert_resource(Gravity(1800.0));
 
-        // #[cfg(debug_assertions)]
-        // {
-        //     app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-        //         .add_plugin(LogDiagnosticsPlugin::default());
-        // }
     }
 }

@@ -55,12 +55,9 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         // }
 
         if GameControl::Space.just_released(&keyboard_input){
-            if GameControl::Space.pressed(&keyboard_input){
-                player_movement.y = 1.;
-            }
-        } else if GameControl::Space.just_pressed(&keyboard_input){
             player_movement.y = 1.;
         }
+
 
 
         if GameControl::Right.just_released(&keyboard_input)

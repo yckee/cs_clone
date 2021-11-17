@@ -2,6 +2,7 @@ use crate::actions::Actions;
 use crate::consts::{ARENA_H, ARENA_W, PLAYER_TILE_SIZE};
 use crate::loading::TextureAssets;
 use crate::GameState;
+use crate::physics::*;
 use bevy::prelude::*;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -45,7 +46,9 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             n_frames: 2,
         })
         .insert(Timer::from_seconds(0.2, true))
-        .insert(Player);
+        .insert(Player)
+        .insert(Velocity{v:Vec2::ZERO})
+        .insert(AffectedByGravity);
 }
 
 fn anim_player(
@@ -65,28 +68,11 @@ fn move_player(
     time: Res<Time>,
     actions: Res<Actions>,
     textures: Res<TextureAssets>,
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<(&mut Transform, &mut Velocity, With<Player>)>,
     mut player_anim: Query<(Entity, &mut PlayerAnim, &mut TextureAtlasSprite)>,
-) {
-    if actions.player_movement.is_none() {
-        let speed = 150.;
-        let movement = Vec3::new(
-            0.0 * speed * time.delta_seconds(),
-            -1.0 * speed * time.delta_seconds(),
-            0.,
-        );
+) {    
 
-        for mut player_transform in player_query.iter_mut() {
-            player_transform.translation += movement;
-            player_transform.translation.x = player_transform.translation.x.clamp(
-                0.5 * (-ARENA_W + PLAYER_TILE_SIZE),
-                0.5 * (ARENA_W - PLAYER_TILE_SIZE),
-            );
-            player_transform.translation.y = player_transform.translation.y.clamp(
-                0.5 * (-ARENA_H + PLAYER_TILE_SIZE),
-                0.5 * (ARENA_H - PLAYER_TILE_SIZE),
-            );
-        }
+    if actions.player_movement.is_none() {        
         for (entity, mut anim, mut sprite) in player_anim.iter_mut() {
             if anim.anim == Animation::Stay {
                 continue;
@@ -94,35 +80,27 @@ fn move_player(
             anim.anim = Animation::Stay;
             anim.n_frames = 2;
             sprite.index = 0;
-            commands.entity(entity).insert(textures.player_stay.clone());
-            
+            commands.entity(entity).insert(textures.player_stay.clone());            
         }
         return;
     }
 
-    let speed = 150.;
-    let movement = Vec3::new(
-        actions.player_movement.unwrap().x * speed * time.delta_seconds(),
-        actions.player_movement.unwrap().y * speed * time.delta_seconds(),
-        0.,
-    );
+    for (mut player_transform, mut vel, p) in player_query.iter_mut() {
+        
+        vel.v.y += actions.player_movement.unwrap().y * 2000.0;
 
-    for mut player_transform in player_query.iter_mut() {
-        player_transform.translation += movement;
+        player_transform.translation.x += actions.player_movement.unwrap().x * 150.0 * time.delta_seconds();
+
         player_transform.translation.x = player_transform.translation.x.clamp(
             0.5 * (-ARENA_W + PLAYER_TILE_SIZE),
             0.5 * (ARENA_W - PLAYER_TILE_SIZE),
-        );
-        player_transform.translation.y = player_transform.translation.y.clamp(
-            0.5 * (-ARENA_H + PLAYER_TILE_SIZE),
-            0.5 * (ARENA_H - PLAYER_TILE_SIZE),
-        );
+          );
     }
 
     for (entity, mut anim, mut sprite) in player_anim.iter_mut() {
-        sprite.flip_x = movement.x >= 0.0;
+        sprite.flip_x = actions.player_movement.unwrap().x >= 0.0;
 
-        if movement.y > 0.0 {
+        if actions.player_movement.unwrap().y > 0.0 {
             if anim.anim != Animation::Jump{
                 sprite.index = 0;
             }
@@ -131,10 +109,11 @@ fn move_player(
             commands.entity(entity).insert(textures.player_jump.clone());
             continue;            
         }
-        if  movement.x != 0.0 {
+        if  actions.player_movement.unwrap().x != 0.0 {
             anim.anim = Animation::Walk;
             anim.n_frames = 7;
             commands.entity(entity).insert(textures.player_walk.clone()); 
         }
     }
+
 }
