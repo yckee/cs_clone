@@ -69,6 +69,24 @@ fn move_player(
     mut player_anim: Query<(Entity, &mut PlayerAnim, &mut TextureAtlasSprite)>,
 ) {
     if actions.player_movement.is_none() {
+        let speed = 150.;
+        let movement = Vec3::new(
+            0.0 * speed * time.delta_seconds(),
+            -1.0 * speed * time.delta_seconds(),
+            0.,
+        );
+
+        for mut player_transform in player_query.iter_mut() {
+            player_transform.translation += movement;
+            player_transform.translation.x = player_transform.translation.x.clamp(
+                0.5 * (-ARENA_W + PLAYER_TILE_SIZE),
+                0.5 * (ARENA_W - PLAYER_TILE_SIZE),
+            );
+            player_transform.translation.y = player_transform.translation.y.clamp(
+                0.5 * (-ARENA_H + PLAYER_TILE_SIZE),
+                0.5 * (ARENA_H - PLAYER_TILE_SIZE),
+            );
+        }
         for (entity, mut anim, mut sprite) in player_anim.iter_mut() {
             if anim.anim == Animation::Stay {
                 continue;
@@ -77,6 +95,7 @@ fn move_player(
             anim.n_frames = 2;
             sprite.index = 0;
             commands.entity(entity).insert(textures.player_stay.clone());
+            
         }
         return;
     }
@@ -101,19 +120,21 @@ fn move_player(
     }
 
     for (entity, mut anim, mut sprite) in player_anim.iter_mut() {
-        if anim.anim == Animation::Walk {
-            sprite.flip_x = movement.x > 0.0;
-            continue;
-        }
-        if  movement.y != 0.0 {
-            anim.anim = Animation::Jump;
-            anim.n_frames = 4;
+        sprite.flip_x = movement.x >= 0.0;
+
+        if movement.y > 0.0 {
+            if anim.anim != Animation::Jump{
+                sprite.index = 0;
+            }
+            anim.anim = Animation::Jump;            
+            anim.n_frames = 3;
             commands.entity(entity).insert(textures.player_jump.clone());
-        }else if movement.x != 0.0 {
+            continue;            
+        }
+        if  movement.x != 0.0 {
             anim.anim = Animation::Walk;
             anim.n_frames = 7;
             commands.entity(entity).insert(textures.player_walk.clone()); 
         }
-
     }
 }
