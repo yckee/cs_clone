@@ -86,8 +86,6 @@ fn move_player(
         actions.player_movement.unwrap().y * speed * time.delta_seconds(),
         0.,
     );
-   
-
 
     for mut player_transform in player_query.iter_mut() {
         player_transform.translation += movement;
@@ -100,9 +98,15 @@ fn move_player(
             sprite.flip_x = movement.x > 0.0;
             continue;
         }
+        if  movement.y != 0.0 {
+            anim.anim = Animation::Jump;
+            anim.n_frames = 4;
+            commands.entity(entity).insert(textures.player_jump.clone());
+        }else if movement.x != 0.0 {
+            anim.anim = Animation::Walk;
+            anim.n_frames = 7;
+            commands.entity(entity).insert(textures.player_walk.clone()); 
+        }
 
-        anim.anim = Animation::Walk;
-        anim.n_frames = 7;
-        commands.entity(entity).insert(textures.player_walk.clone());
     }
 }
