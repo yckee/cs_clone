@@ -1,8 +1,7 @@
+use crate::consts::*;
 use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
-use crate::consts::*;
-
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TileType {
