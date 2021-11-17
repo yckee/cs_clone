@@ -28,6 +28,10 @@ fn gravity_system(
 ) {
   for mut velocity in  velocities.iter_mut() {
     velocity.v.y -= gravity.0 * time.delta_seconds();
+    // if velocity.v.y>0.0 {
+    //   println!("{:}",velocity.v.y);
+    // }
+    
     velocity.v.x = 150.0;
     
     velocity.v.y = velocity.v.y.clamp(            
@@ -44,7 +48,7 @@ fn velocity_system(
    {
     let delta = time.delta_seconds();
     for (mut position, mut velocity) in positions.iter_mut() {
-      position.translation.y = position.translation.y + velocity.v.y*delta; 
+      position.translation.y = position.translation.y + velocity.v.y *delta; 
 
       position.translation.y = position.translation.y.clamp(            
         0.5 * (-ARENA_H + PLAYER_TILE_SIZE),

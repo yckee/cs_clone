@@ -39,7 +39,7 @@ impl Plugin for GamePlugin {
             .add_plugin(PlayerPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(PhysicsPlugin)
-            .insert_resource(Gravity(1800.0));
+            .insert_resource(Gravity(1000.0));
 
     }
 }

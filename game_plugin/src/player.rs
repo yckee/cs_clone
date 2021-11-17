@@ -86,8 +86,11 @@ fn move_player(
     }
 
     for (mut player_transform, mut vel, p) in player_query.iter_mut() {
-        
-        vel.v.y += actions.player_movement.unwrap().y * 2000.0;
+
+        if actions.player_movement.unwrap().y != 0.0 {
+            println!("{:}",actions.player_movement.unwrap().y);
+            vel.v.y = 400.0;
+        }       
 
         player_transform.translation.x += actions.player_movement.unwrap().x * 150.0 * time.delta_seconds();
 

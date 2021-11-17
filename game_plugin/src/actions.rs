@@ -57,6 +57,9 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         if GameControl::Space.just_released(&keyboard_input){
             player_movement.y = 1.;
         }
+        else {
+            player_movement.y = 0.0;
+        }
 
 
 
@@ -65,15 +68,27 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         {
             if GameControl::Right.pressed(&keyboard_input) {
                 player_movement.x = 1.;
+                if player_movement.y !=0.0 {
+                    player_movement.y = 0.0;
+                }
             } else if GameControl::Left.pressed(&keyboard_input) {
                 player_movement.x = -1.;
+                if player_movement.y !=0.0 {
+                    player_movement.y = 0.0;
+                }
             } else {
                 player_movement.x = 0.;
             }
         } else if GameControl::Right.just_pressed(&keyboard_input) {
             player_movement.x = 1.;
+            if player_movement.y !=0.0 {
+                player_movement.y = 0.0;
+            }
         } else if GameControl::Left.just_pressed(&keyboard_input) {
             player_movement.x = -1.;
+            if player_movement.y !=0.0 {
+                player_movement.y = 0.0;
+            }
         } else {
             player_movement.x = actions.player_movement.unwrap_or(Vec2::ZERO).x;
         }
