@@ -1,5 +1,5 @@
 [package]
-name = "clone" 
+name = "cs_clone" 
 version = "0.1.0"
 publish = false
 authors = ["OYZL"] # ToDo: you are the author ;)
