@@ -90,7 +90,7 @@ pub struct TextureAssets {
     #[asset(path = "textures/character_one/character_one_sprite_animation_stay.png")]
     pub player_stay: Handle<TextureAtlas>,
 
-    #[asset(texture_atlas(tile_size_x = 64., tile_size_y = 64., columns = 8, rows = 1))]
+    #[asset(texture_atlas(tile_size_x = 64., tile_size_y = 64., columns = 7, rows = 1))]
     #[asset(path = "textures/character_one/character_one_sprite_animation_walk.png")]
     pub player_walk: Handle<TextureAtlas>,
 

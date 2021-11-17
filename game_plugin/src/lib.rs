@@ -2,6 +2,7 @@ mod actions;
 mod loading;
 mod map;
 mod player;
+mod consts;
 
 use crate::actions::ActionsPlugin;
 use crate::loading::LoadingPlugin;

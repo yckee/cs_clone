@@ -1,13 +1,8 @@
 use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
+use crate::consts::*;
 
-const MAP_W: f32 = 32.0;
-const MAP_H: f32 = 32.0;
-// Square arena width == height
-// Values should be divisible by MAP_W / MAP_H to avoid fucked up map;
-const ARENA_W: f32 = 640.0;
-const ARENA_H: f32 = 640.0;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TileType {
