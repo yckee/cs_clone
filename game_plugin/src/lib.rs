@@ -1,10 +1,12 @@
 mod actions;
+mod collision;
 mod consts;
 mod loading;
 mod map;
 mod player;
 
 use crate::actions::ActionsPlugin;
+use crate::collision::CollisionPlugin;
 use crate::loading::LoadingPlugin;
 use crate::map::MapPlugin;
 use crate::player::PlayerPlugin;
@@ -35,7 +37,8 @@ impl Plugin for GamePlugin {
             .add_plugin(LoadingPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(ActionsPlugin);
+            .add_plugin(ActionsPlugin)
+            .add_plugin(CollisionPlugin);
 
         // #[cfg(debug_assertions)]
         // {

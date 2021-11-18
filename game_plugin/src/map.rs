@@ -1,3 +1,4 @@
+use crate::collision::Collider;
 use crate::consts::*;
 use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
@@ -22,6 +23,14 @@ impl TileType {
             10 => TileType::Special,
             11 => TileType::TreeGround,
             _ => TileType::Background,
+        }
+    }
+
+    fn get_collider_from_tiletype(tiletype: TileType) -> Option<Collider> {
+        match tiletype {
+            TileType::TreeGround => Some(Collider::Phantom),
+            TileType::Background => None,
+            _ => Some(Collider::Solid),
         }
     }
 }
@@ -116,26 +125,33 @@ fn spawn_map(
     );
 
     for (y, row) in map.topology.iter().enumerate() {
-        for (x, tile_type) in row.iter().enumerate() {
+        for (x, tile_type_ind) in row.iter().enumerate() {
             let coords = Coordinate::new(x, y);
             let pos = map.coordinate_to_pixel(&coords, ARENA_W, ARENA_H);
             let scale = map.get_transform_scale();
+            let tile_type = TileType::get_tiletype_from_index(*tile_type_ind);
 
-            commands
+            let entity = commands
                 .spawn_bundle(SpriteSheetBundle {
                     transform: Transform {
                         translation: pos.extend(1.0),
                         scale: scale.extend(1.0),
                         ..Default::default()
                     },
-                    sprite: TextureAtlasSprite::new(*tile_type),
+                    sprite: TextureAtlasSprite::new(*tile_type_ind),
                     texture_atlas: textures.tileset.clone(),
                     ..Default::default()
                 })
                 .insert(MapTile {
-                    tiletype: TileType::get_tiletype_from_index(*tile_type),
+                    tiletype: tile_type,
                     position: coords,
-                });
+                })
+                .id();
+
+            if let Some(collider) = TileType::get_collider_from_tiletype(tile_type) {
+                    commands.entity(entity).insert(collider);
+            }
+
         }
     }
 
