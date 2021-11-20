@@ -2,6 +2,9 @@ use crate::consts::*;
 use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
+use bevy_ecs_tilemap::prelude::*;
+
+
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TileType {
@@ -26,61 +29,6 @@ impl TileType {
     }
 }
 
-pub struct Coordinate {
-    pub x: usize,
-    pub y: usize,
-}
-impl Coordinate {
-    fn new(x: usize, y: usize) -> Self {
-        Self { x, y }
-    }
-}
-
-pub struct MapTile {
-    pub tiletype: TileType,
-    pub position: Coordinate,
-}
-
-pub struct Map {
-    pub size: Vec2,
-    pub tile_size: Vec2,
-    pub topology: Vec<Vec<u32>>,
-    pub texture_atlas: Handle<TextureAtlas>,
-    pub texture_tile_size: f32,
-}
-
-impl Map {
-    fn new(
-        size: Vec2,
-        tile_size: Vec2,
-        topology: Vec<Vec<u32>>,
-        texture_atlas: Handle<TextureAtlas>,
-        texture_tile_size: f32,
-    ) -> Self {
-        Self {
-            size,
-            tile_size,
-            topology,
-            texture_atlas,
-            texture_tile_size,
-        }
-    }
-
-    fn coordinate_to_pixel(&self, pos: &Coordinate, bound_w: f32, bound_h: f32) -> Vec2 {
-        Vec2::new(
-            pos.x as f32 / self.size.x * bound_w - 0.5 * bound_w + (0.5 * self.tile_size.x),
-            0.5 * bound_h - pos.y as f32 / self.size.y * bound_h - (0.5 * self.tile_size.y),
-        )
-    }
-
-    fn get_transform_scale(&self) -> Vec2 {
-        Vec2::new(
-            self.tile_size.x / self.texture_tile_size,
-            self.tile_size.y / self.texture_tile_size,
-        )
-    }
-}
-
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
@@ -90,6 +38,10 @@ impl Plugin for MapPlugin {
                 .with_system(spawn_map.system())
                 .with_system(spawn_camera.system()),
         );
+        // .add_system_set(
+        //     SystemSet::on_update(GameState::Playing)
+        //     .with_system(rescale_map.system())
+        // );
     }
 }
 
@@ -97,47 +49,79 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }
 
+
 fn spawn_map(
     mut commands: Commands,
     textures: Res<TextureAssets>,
     maps: Res<MapAssets>,
     map_assets: Res<Assets<MapAsset>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut map_query: MapQuery,
 ) {
-    let map_asset = map_assets
+    let mut map_asset = map_assets
         .get(maps.map_one.clone())
         .expect("Failed to find MapAsset");
 
-    let map = Map::new(
-        Vec2::new(MAP_W, MAP_H),
-        Vec2::new(ARENA_W / MAP_W, ARENA_H / MAP_H),
-        map_asset.map.clone(),
-        textures.tileset.clone(),
-        32.0,
+    let tileset_material_handle = materials.add(ColorMaterial::texture(textures.tileset.clone()));
+
+    let map_entity = commands.spawn().id();
+    let mut map = Map::new(0u16, map_entity);
+
+    let layer_settings = LayerSettings::new(
+        MapSize(2, 2),
+        ChunkSize(16, 16),
+        TileSize(32.0, 32.0),
+        TextureSize(192.0, 64.0),
+    );
+    let center = layer_settings.get_pixel_center();
+
+    let (mut layer_builder, _) = LayerBuilder::<TileBundle>::new(
+        &mut commands,
+        layer_settings,
+        0u16,
+        0u16,
+        None,
     );
 
-    for (y, row) in map.topology.iter().enumerate() {
-        for (x, tile_type) in row.iter().enumerate() {
-            let coords = Coordinate::new(x, y);
-            let pos = map.coordinate_to_pixel(&coords, ARENA_W, ARENA_H);
-            let scale = map.get_transform_scale();
+    layer_builder.set_all(TileBundle::default());
 
-            commands
-                .spawn_bundle(SpriteSheetBundle {
-                    transform: Transform {
-                        translation: pos.extend(1.0),
-                        scale: scale.extend(1.0),
-                        ..Default::default()
-                    },
-                    sprite: TextureAtlasSprite::new(*tile_type),
-                    texture_atlas: textures.tileset.clone(),
+    for (y, row) in map_asset.map.iter().enumerate() {
+        for (x, tile_index) in row.iter().enumerate() {
+            let tile_pos = TilePos(x as u32, y as u32);
+            let _ = layer_builder.set_tile(
+                tile_pos, 
+                Tile{
+                    texture_index: *tile_index as u16,
                     ..Default::default()
-                })
-                .insert(MapTile {
-                    tiletype: TileType::get_tiletype_from_index(*tile_type),
-                    position: coords,
-                });
+                }.into()
+            );
+
+            let tile_entity = layer_builder.get_tile_entity(&mut commands, tile_pos).unwrap();
+            commands.entity(tile_entity).insert(TileType::get_tiletype_from_index(*tile_index));
         }
     }
 
-    commands.insert_resource(map);
+    let layer_entity = map_query.build_layer(&mut commands, layer_builder, tileset_material_handle);
+
+    map.add_layer(&mut commands, 0u16, layer_entity);
+
+    commands
+        .entity(map_entity)
+        .insert(map)
+        .insert(Transform {
+            scale: Vec3::new(0.625, 0.625, 0.625),
+            translation: Vec3::new(-center.x * 0.625, -center.y * 0.625, 0.0),
+            ..Default::default()
+        })
+        // .insert(Transform::from_xyz(-center.x, -center.y, 0.0))
+        .insert(GlobalTransform::default());
 }
+
+// fn rescale_map(
+//     mut commands: Commands,
+//     mut map_query: Query<&mut Transform, With<Map>>
+// ) {
+//     for mut transform in map_query.iter_mut() {
+//         transform.scale = Vec3::new(0.625, 0.625, 0.625);
+//     }
+// }

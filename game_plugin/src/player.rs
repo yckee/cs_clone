@@ -95,7 +95,6 @@ fn move_player(
             anim.n_frames = 2;
             sprite.index = 0;
             commands.entity(entity).insert(textures.player_stay.clone());
-            
         }
         return;
     }
@@ -123,18 +122,18 @@ fn move_player(
         sprite.flip_x = movement.x >= 0.0;
 
         if movement.y > 0.0 {
-            if anim.anim != Animation::Jump{
+            if anim.anim != Animation::Jump {
                 sprite.index = 0;
             }
-            anim.anim = Animation::Jump;            
+            anim.anim = Animation::Jump;
             anim.n_frames = 3;
             commands.entity(entity).insert(textures.player_jump.clone());
-            continue;            
+            continue;
         }
-        if  movement.x != 0.0 {
+        if movement.x != 0.0 {
             anim.anim = Animation::Walk;
             anim.n_frames = 7;
-            commands.entity(entity).insert(textures.player_walk.clone()); 
+            commands.entity(entity).insert(textures.player_walk.clone());
         }
     }
 }

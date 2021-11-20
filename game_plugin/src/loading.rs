@@ -36,6 +36,7 @@ impl AssetLoader for MapAssetLoader {
                 let record: Vec<u32> = result?;
                 map.push(record);
             }
+            map.reverse();
 
             let map_asset = MapAsset { map };
             load_context.set_default_asset(LoadedAsset::new(map_asset));
@@ -82,9 +83,11 @@ pub struct AudioAssets {
 
 #[derive(AssetCollection)]
 pub struct TextureAssets {
-    #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 6, rows = 2))]
+    // #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 6, rows = 2))]
+    // #[asset(path = "textures/templates/templates_map_one.png")]
+    // pub tileset: Handle<TextureAtlas>,
     #[asset(path = "textures/templates/templates_map_one.png")]
-    pub tileset: Handle<TextureAtlas>,
+    pub tileset: Handle<Texture>,
 
     #[asset(texture_atlas(tile_size_x = 64., tile_size_y = 64., columns = 2, rows = 1))]
     #[asset(path = "textures/character_one/character_one_sprite_animation_stay.png")]

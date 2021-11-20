@@ -10,6 +10,7 @@ use crate::map::MapPlugin;
 use crate::player::PlayerPlugin;
 
 use bevy::app::AppBuilder;
+use bevy_ecs_tilemap::prelude::TilemapPlugin;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
@@ -32,10 +33,12 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_state(GameState::Loading)
+            .add_plugin(TilemapPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(ActionsPlugin);
+            .add_plugin(ActionsPlugin)
+            ;
 
         // #[cfg(debug_assertions)]
         // {

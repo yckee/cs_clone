@@ -35,8 +35,8 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         // if GameControl::Up.just_released(&keyboard_input)
         //     || GameControl::Down.just_released(&keyboard_input)
         // {
-        //     if GameControl::Up.pressed(&keyboard_input) 
-        //         || GameControl::Space.pressed(&keyboard_input) 
+        //     if GameControl::Up.pressed(&keyboard_input)
+        //         || GameControl::Space.pressed(&keyboard_input)
         //     {
         //         player_movement.y = 1.;
         //     } else if GameControl::Down.pressed(&keyboard_input) {
@@ -44,7 +44,7 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         //     } else {
         //         player_movement.y = 0.;
         //     }
-        // } else if GameControl::Up.just_pressed(&keyboard_input) 
+        // } else if GameControl::Up.just_pressed(&keyboard_input)
         //             || GameControl::Space.just_pressed(&keyboard_input)
         // {
         //     player_movement.y = 1.;
@@ -54,14 +54,13 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
         //     player_movement.y = actions.player_movement.unwrap_or(Vec2::ZERO).y;
         // }
 
-        if GameControl::Space.just_released(&keyboard_input){
-            if GameControl::Space.pressed(&keyboard_input){
+        if GameControl::Space.just_released(&keyboard_input) {
+            if GameControl::Space.pressed(&keyboard_input) {
                 player_movement.y = 1.;
             }
-        } else if GameControl::Space.just_pressed(&keyboard_input){
+        } else if GameControl::Space.just_pressed(&keyboard_input) {
             player_movement.y = 1.;
         }
-
 
         if GameControl::Right.just_released(&keyboard_input)
             || GameControl::Left.just_released(&keyboard_input)
@@ -117,9 +116,7 @@ impl GameControl {
                 keyboard_input.just_released(KeyCode::D)
                     || keyboard_input.just_released(KeyCode::Right)
             }
-            GameControl::Space => { 
-                keyboard_input.just_released(KeyCode::Space)
-            }
+            GameControl::Space => keyboard_input.just_released(KeyCode::Space),
         }
     }
 
@@ -137,9 +134,7 @@ impl GameControl {
             GameControl::Right => {
                 keyboard_input.pressed(KeyCode::D) || keyboard_input.pressed(KeyCode::Right)
             }
-            GameControl::Space => { 
-                keyboard_input.pressed(KeyCode::Space)
-            }
+            GameControl::Space => keyboard_input.pressed(KeyCode::Space),
         }
     }
 
@@ -160,9 +155,7 @@ impl GameControl {
                 keyboard_input.just_pressed(KeyCode::D)
                     || keyboard_input.just_pressed(KeyCode::Right)
             }
-            GameControl::Space => { 
-                keyboard_input.pressed(KeyCode::Space)
-            }
+            GameControl::Space => keyboard_input.pressed(KeyCode::Space),
         }
     }
 }
