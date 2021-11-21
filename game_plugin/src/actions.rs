@@ -32,35 +32,35 @@ fn set_movement_actions(mut actions: ResMut<Actions>, keyboard_input: Res<Input<
     {
         let mut player_movement = Vec2::ZERO;
 
-        // if GameControl::Up.just_released(&keyboard_input)
-        //     || GameControl::Down.just_released(&keyboard_input)
-        // {
-        //     if GameControl::Up.pressed(&keyboard_input)
-        //         || GameControl::Space.pressed(&keyboard_input)
-        //     {
-        //         player_movement.y = 1.;
-        //     } else if GameControl::Down.pressed(&keyboard_input) {
-        //         player_movement.y = -1.;
-        //     } else {
-        //         player_movement.y = 0.;
-        //     }
-        // } else if GameControl::Up.just_pressed(&keyboard_input)
-        //             || GameControl::Space.just_pressed(&keyboard_input)
-        // {
-        //     player_movement.y = 1.;
-        // } else if GameControl::Down.just_pressed(&keyboard_input) {
-        //     player_movement.y = -1.;
-        // } else {
-        //     player_movement.y = actions.player_movement.unwrap_or(Vec2::ZERO).y;
-        // }
-
-        if GameControl::Space.just_released(&keyboard_input) {
-            if GameControl::Space.pressed(&keyboard_input) {
+        if GameControl::Up.just_released(&keyboard_input)
+            || GameControl::Down.just_released(&keyboard_input)
+        {
+            if GameControl::Up.pressed(&keyboard_input)
+                // || GameControl::Space.pressed(&keyboard_input)
+            {
                 player_movement.y = 1.;
+            } else if GameControl::Down.pressed(&keyboard_input) {
+                player_movement.y = -1.;
+            } else {
+                player_movement.y = 0.;
             }
-        } else if GameControl::Space.just_pressed(&keyboard_input) {
+        } else if GameControl::Up.just_pressed(&keyboard_input)
+                    // || GameControl::Space.just_pressed(&keyboard_input)
+        {
             player_movement.y = 1.;
+        } else if GameControl::Down.just_pressed(&keyboard_input) {
+            player_movement.y = -1.;
+        } else {
+            player_movement.y = actions.player_movement.unwrap_or(Vec2::ZERO).y;
         }
+
+        // if GameControl::Space.just_released(&keyboard_input) {
+        //     if GameControl::Space.pressed(&keyboard_input) {
+        //         player_movement.y = 1.;
+        //     }
+        // } else if GameControl::Space.just_pressed(&keyboard_input) {
+        //     player_movement.y = 1.;
+        // }
 
         if GameControl::Right.just_released(&keyboard_input)
             || GameControl::Left.just_released(&keyboard_input)

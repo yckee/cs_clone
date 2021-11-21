@@ -35,6 +35,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_state(GameState::Loading)
+            .insert_resource(Gravity::from(Vec3::new(0.0, -50.0, 0.0)))
             .add_plugin(PhysicsPlugin::default())
             .add_plugin(TilemapPlugin)
             .add_plugin(LoadingPlugin)

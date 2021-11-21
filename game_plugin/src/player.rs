@@ -49,7 +49,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             n_frames: 2,
         })
         .insert(Timer::from_seconds(0.2, true))
-        .insert(RigidBody::KinematicPositionBased)
+        .insert(RigidBody::Dynamic)
         .insert(CollisionShape::Cuboid {
             half_extends: Vec3::new(15.0, 25.0, 0.0),
             border_radius: None,
@@ -78,24 +78,24 @@ fn move_player(
     mut player_anim: Query<(Entity, &mut PlayerAnim, &mut TextureAtlasSprite)>,
 ) {
     if actions.player_movement.is_none() {
-        let speed = 150.;
-        let movement = Vec3::new(
-            0.0 * speed * time.delta_seconds(),
-            -1.0 * speed * time.delta_seconds(),
-            0.,
-        );
+        // let speed = 150.;
+        // let movement = Vec3::new(
+        //     0.0 * speed * time.delta_seconds(),
+        //     -1.0 * speed * time.delta_seconds(),
+        //     0.,
+        // );
 
-        for mut player_transform in player_query.iter_mut() {
-            player_transform.translation += movement;
-            player_transform.translation.x = player_transform.translation.x.clamp(
-                0.5 * (-ARENA_W + PLAYER_TILE_SIZE),
-                0.5 * (ARENA_W - PLAYER_TILE_SIZE),
-            );
-            player_transform.translation.y = player_transform.translation.y.clamp(
-                0.5 * (-ARENA_H + PLAYER_TILE_SIZE),
-                0.5 * (ARENA_H - PLAYER_TILE_SIZE),
-            );
-        }
+        // for mut player_transform in player_query.iter_mut() {
+        //     player_transform.translation += movement;
+        //     player_transform.translation.x = player_transform.translation.x.clamp(
+        //         0.5 * (-ARENA_W + PLAYER_TILE_SIZE),
+        //         0.5 * (ARENA_W - PLAYER_TILE_SIZE),
+        //     );
+        //     player_transform.translation.y = player_transform.translation.y.clamp(
+        //         0.5 * (-ARENA_H + PLAYER_TILE_SIZE),
+        //         0.5 * (ARENA_H - PLAYER_TILE_SIZE),
+        //     );
+        // }
         for (entity, mut anim, mut sprite) in player_anim.iter_mut() {
             if anim.anim == Animation::Stay {
                 continue;
