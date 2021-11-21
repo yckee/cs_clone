@@ -3,6 +3,9 @@ use crate::loading::{MapAsset, MapAssets, TextureAssets};
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+// use bevy_rapier2d::prelude::*;
+use heron::prelude::*;
+
 
 
 
@@ -29,18 +32,34 @@ impl TileType {
     }
 }
 
+fn convert_tilepos_to_global(tile_pos: TilePos, arena_size: Vec2, grid_size: Vec2, tile_size_x: f32, tile_size_y: f32) -> Vec2 {
+    Vec2::new(
+        tile_pos.0 as f32 / grid_size.x * arena_size.x - 0.5 * arena_size.x + (0.5 * tile_size_x),
+        tile_pos.1 as f32 / grid_size.y * arena_size.y - 0.5 * arena_size.y + (0.5 * tile_size_y),
+    )
+}
+
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_system_set(
             SystemSet::on_enter(GameState::Playing)
+                .with_system(spawn_camera.system())
                 .with_system(spawn_map.system())
-                .with_system(spawn_camera.system()),
-        );
-        // .add_system_set(
-        //     SystemSet::on_update(GameState::Playing)
-        //     .with_system(rescale_map.system())
+                .label("spawn")
+            )
+            ;
+            // .add_system_set(
+            //     SystemSet::on_enter(GameState::Playing)
+            //         .after("spawn")
+            // )
+            // .add_system_set(
+                // SystemSet::on_update(GameState::Playing)
+                // .with_system(setup_tiles.system())
+                // .with_system(test.system())
+                // .with_system(rescale_map.system())
+
         // );
     }
 }
@@ -58,6 +77,7 @@ fn spawn_map(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut map_query: MapQuery,
 ) {
+    println!("spawn_map");
     let mut map_asset = map_assets
         .get(maps.map_one.clone())
         .expect("Failed to find MapAsset");
@@ -83,7 +103,15 @@ fn spawn_map(
         None,
     );
 
-    layer_builder.set_all(TileBundle::default());
+    // layer_builder.set_all(TileBundle::default().into());
+
+
+    let arena_size = Vec2::new(
+        layer_settings.grid_size.x * layer_settings.tile_size.0,
+        layer_settings.grid_size.y * layer_settings.tile_size.1,
+    );
+
+    // Vec2::splat(0.625);    
 
     for (y, row) in map_asset.map.iter().enumerate() {
         for (x, tile_index) in row.iter().enumerate() {
@@ -95,9 +123,30 @@ fn spawn_map(
                     ..Default::default()
                 }.into()
             );
+            let tile_type = TileType::get_tiletype_from_index(*tile_index);
+            let tile_pixel_pos = convert_tilepos_to_global(tile_pos, arena_size, layer_settings.grid_size, layer_settings.tile_size.0, layer_settings.tile_size.0) * MAP_SCALE;
 
             let tile_entity = layer_builder.get_tile_entity(&mut commands, tile_pos).unwrap();
-            commands.entity(tile_entity).insert(TileType::get_tiletype_from_index(*tile_index));
+            // println!("{:?}",layer_builder.get_tile(tile_pos).unwrap().parent.chunk);
+            commands.entity(tile_entity)
+                .insert(tile_type)
+                .insert(Transform {
+                    scale: Vec3::splat(MAP_SCALE),
+                    translation: tile_pixel_pos.extend(1.0),
+                    ..Default::default()
+                })
+                .insert(GlobalTransform::default());
+
+            if tile_type != TileType::Background {
+                    commands.entity(tile_entity)
+                        // .insert(GlobalTransform::default())
+                        .insert(RigidBody::Static)
+                        // .insert(CollisionShape::Sphere{ radius: 14.0});
+                        .insert(CollisionShape::Cuboid {
+                            half_extends: Vec3::new(10.0, 10.0, 0.0),
+                            border_radius: None,
+                        });
+            }
         }
     }
 
@@ -109,13 +158,28 @@ fn spawn_map(
         .entity(map_entity)
         .insert(map)
         .insert(Transform {
-            scale: Vec3::new(0.625, 0.625, 0.625),
-            translation: Vec3::new(-center.x * 0.625, -center.y * 0.625, 0.0),
+            scale: Vec3::splat(MAP_SCALE),
+            translation: Vec3::new(-center.x * MAP_SCALE, -center.y * MAP_SCALE, 1.0),
             ..Default::default()
         })
         // .insert(Transform::from_xyz(-center.x, -center.y, 0.0))
         .insert(GlobalTransform::default());
 }
+
+// fn setup_tiles(
+//     mut commands: Commands,
+//     map_q: Query<&Map>,
+//     // map: Res<Map>,
+//     mut tiles_q: Query<(Entity, &mut TilePos), Added<Tile>>
+// ) {
+//     // let map = map_q.iter().next().unwrap();
+//     // map.
+//     for (tile_entity, mut tile_pos) in tiles_q.iter_mut() {
+//         // println!("111");
+//         // let pix_tile_pos = convert_tilepos_to_global(tile_pos, arena_size, grid_size, tile_size_x, tile_size_y);
+//         println!("{:?}", tile_pos);
+//     }
+// }
 
 // fn rescale_map(
 //     mut commands: Commands,
@@ -123,5 +187,15 @@ fn spawn_map(
 // ) {
 //     for mut transform in map_query.iter_mut() {
 //         transform.scale = Vec3::new(0.625, 0.625, 0.625);
+//     }
+// }
+
+// fn test(
+//     q: Query<&Tile>
+// ) {
+//     println!("In test");
+//     for body in q.iter(){
+//         println!("{:?}", body.texture_index);
+//         // println!("Have trnsfrom! C: {:?} Pos: {:?}", c, t.translation);
 //     }
 // }

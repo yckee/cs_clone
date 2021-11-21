@@ -14,6 +14,8 @@ use bevy_ecs_tilemap::prelude::TilemapPlugin;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+// use bevy_rapier2d::prelude::*;
+use heron::prelude::*;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -33,17 +35,19 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_state(GameState::Loading)
+            .add_plugin(PhysicsPlugin::default())
             .add_plugin(TilemapPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(ActionsPlugin)
+            // .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
             ;
 
-        // #[cfg(debug_assertions)]
-        // {
-        //     app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-        //         .add_plugin(LogDiagnosticsPlugin::default());
-        // }
+        #[cfg(debug_assertions)]
+        {
+            app.add_plugin(FrameTimeDiagnosticsPlugin::default())
+                .add_plugin(LogDiagnosticsPlugin::default());
+        }
     }
 }

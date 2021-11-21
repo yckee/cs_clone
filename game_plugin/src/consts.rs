@@ -1,5 +1,6 @@
 pub const MAP_W: f32 = 32.0;
 pub const MAP_H: f32 = 32.0;
+pub const MAP_SCALE: f32 = 0.625;
 // Square arena width == height
 // Values should be divisible by MAP_W / MAP_H to avoid fucked up map;
 pub const ARENA_W: f32 = 640.0;

@@ -3,7 +3,7 @@ name = "game_plugin"
 version = "0.1.0"
 publish = false
 authors = ["OYZL"] 
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,6 +13,7 @@ bevy_kira_audio = { version = "0.6.0" }
 bevy_asset_loader = { version = "0.6.0" }
 bevy_ecs_tilemap = { git = "https://github.com/StarArawn/bevy_ecs_tilemap", rev= "f69a77ff75d51a1a0a451221625e195e68dc6bcd"}
 bevy_rapier2d = "0.11.0"
+heron = { version = "0.12.1", features = ["debug-2d"] }
 
 rand = "0.8.3"
 csv = "1.1"

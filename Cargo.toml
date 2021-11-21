@@ -3,7 +3,7 @@ name = "cs_clone"
 version = "0.1.0"
 publish = false
 authors = ["OYZL"] # ToDo: you are the author ;)
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 bevy = { version = "0.5.0"}

@@ -3,6 +3,9 @@ use crate::consts::{ARENA_H, ARENA_W, PLAYER_TILE_SIZE};
 use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::Collision;
+// use bevy_rapier2d::prelude::*;
+use heron::prelude::*;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Animation {
@@ -27,7 +30,8 @@ impl Plugin for PlayerPlugin {
         .add_system_set(
             SystemSet::on_update(GameState::Playing)
                 .with_system(anim_player.system())
-                .with_system(move_player.system()),
+                .with_system(move_player.system())
+                .with_system(detect_collisions.system()),
         );
     }
 }
@@ -45,6 +49,11 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             n_frames: 2,
         })
         .insert(Timer::from_seconds(0.2, true))
+        .insert(RigidBody::KinematicPositionBased)
+        .insert(CollisionShape::Cuboid {
+            half_extends: Vec3::new(15.0, 25.0, 0.0),
+            border_radius: None,
+        })
         .insert(Player);
 }
 
@@ -134,6 +143,19 @@ fn move_player(
             anim.anim = Animation::Walk;
             anim.n_frames = 7;
             commands.entity(entity).insert(textures.player_walk.clone());
+        }
+    }
+}
+
+fn detect_collisions(mut events: EventReader<CollisionEvent>) {
+    for event in events.iter() {
+        match event {
+            CollisionEvent::Started(data1, data2) => {
+                println!("Entity {:?} and {:?} started to collide", data1.rigid_body_entity(), data2.rigid_body_entity())
+            }
+            CollisionEvent::Stopped(data1, data2) => {
+                println!("Entity {:?} and {:?} stopped to collide", data1.rigid_body_entity(), data2.rigid_body_entity())
+            }
         }
     }
 }
